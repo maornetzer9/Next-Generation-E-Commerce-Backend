@@ -38,8 +38,8 @@ const auth = async (req) => {
     } 
     catch (err) 
     {
-        console.error('Failed to verify user.', err.message);
-        return { code: 500, message: 'Failed to verify user.' };
+        console.error('Internal Server Error.', err.message);
+        return { code: 500, message: 'Internal Server Error.' };
     }
 };
 
@@ -81,7 +81,7 @@ const login = async (req) => {
     } 
     catch (err) 
     {
-        console.error('Failed To Register User', err);
+        console.error('Internal Server Error', err);
         return { code: 500, message: 'Internal Server Error' };
         
     }
@@ -104,7 +104,7 @@ const register = async (req) => {
     }
     catch(err)
     {
-        console.error('Failed To Register User', err);
+        console.error('Internal Server Error', err);
         return { code: 500, message: 'Internal Server Error' };
     }
 }
@@ -138,10 +138,44 @@ const update = async (req) => {
     }
     catch(err)
     {
-        console.error('Failed To Update Customer Details', err.message);
+        console.error('Internal Server Error', err.message);
         return { code: 500, message: 'Internal Server Error' };
     }
 };
 
 
-module.exports = { auth, login, register, update };
+const disconnect = async (req) => {
+    try 
+    {
+        const token = req.headers.authorization?.split(' ')[1];
+        
+        if (!token) return { code: 401, message: 'Authorization token missing' };
+
+        // Verify the token
+        const userVerification = jwtUtils.verifyToken(token);
+        if (!userVerification) return { code: 403, message: 'Invalid token' };
+
+        const { _id } = userVerification.user;
+
+        // Find the user and remove the token (or set it to null)
+        const user = await User.findOneAndUpdate( 
+            {_id},
+            { $set: { isAuth: false, token: null } },
+            { new: true }
+        );
+
+        if (!user) return { code: 404, message: 'User not found' };
+
+        // Invalidate the token
+
+        return { code: 200, message: 'User logged out successfully' };
+    } 
+    catch(err) 
+    {
+        console.error('Failed to log out user:', err.message);
+        return { code: 500, message: 'Internal Server Error' };
+    }
+};
+
+
+module.exports = { auth, login, register, update, disconnect};

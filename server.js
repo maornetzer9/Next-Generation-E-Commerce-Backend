@@ -10,10 +10,11 @@ const PORT = 3000;
 const app = express();
 const ORIGIN = process.env.ORIGIN
 const RENDER = process.env.RENDER
+const MONGOOSE_URI = process.env.MONGOOSE
 const corsOptions = {
     origin: function (origin, callback) {
       // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
+      if (origin) return callback(null, true);
   
       const allowedOrigins = [RENDER, ORIGIN]; // Add your allowed origins
   
@@ -28,7 +29,7 @@ const corsOptions = {
 const timeZone = new Date().toLocaleString({timeZone: 'Asia/Jerusalem'});
 
 // Required Routers
-const { customersRouter } = require('./routes/customers');
+const { customersRouter } = require('./routes/user');
 const { productsRouter } = require('./routes/products');
 const { ordersRouter } = require('./routes/orders');
 const { cartRouter } = require('./routes/cart');
@@ -47,7 +48,7 @@ app.use('/cart', cartRouter);
 app.use('/admin', adminOrders);
 
 // MongoDB Connection
-mongoose.connect('mongodb+srv://maornetzer9:Maor013254777@maor.quyl8kx.mongodb.net/E-Commerce-Admin')
+mongoose.connect(MONGOOSE_URI)
 .then(() => {
     const name = mongoose.connection.name;
 

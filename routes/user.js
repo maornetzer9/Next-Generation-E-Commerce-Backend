@@ -1,5 +1,5 @@
 // const auth = require('../services/auth');
-const { auth, login, register, update } = require('../services/customers');
+const { auth, login, register, update, disconnect } = require('../services/user');
 
 const router = require('express').Router();
 
@@ -53,6 +53,20 @@ router.post('/register', async (req, res) => {
     {
         console.error('Failed To Register User', err.message);
         return res.status(500).json({ message: 'Registration failed', error: err.message });
+    }
+});
+
+
+router.get('/disconnect', async (req, res) => {
+    try
+    {
+        const response = await disconnect(req); 
+        return res.status(200).json(response);
+    }
+    catch(err)
+    {
+        console.error('Disconnect Failed',err.message);
+        return res.status(500).json('Internal Server Error', err.message);
     }
 });
 
