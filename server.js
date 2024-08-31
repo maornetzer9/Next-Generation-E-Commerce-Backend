@@ -10,7 +10,7 @@ const PORT = 3000;
 const app = express();
 const ORIGIN = process.env.ORIGIN
 const RENDER = process.env.RENDER
-const corsOptions = {origin: RENDER, optionsSuccessStatus: 200};
+const corsOptions = {origin: ORIGIN, optionsSuccessStatus: 200};
 const timeZone = new Date().toLocaleString({timeZone: 'Asia/Jerusalem'});
 
 // Required Routers
