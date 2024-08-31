@@ -10,7 +10,21 @@ const PORT = 3000;
 const app = express();
 const ORIGIN = process.env.ORIGIN
 const RENDER = process.env.RENDER
-const corsOptions = {origin: ORIGIN, optionsSuccessStatus: 200};
+const corsOptions = {
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+  
+      const allowedOrigins = [RENDER, ORIGIN]; // Add your allowed origins
+  
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    optionsSuccessStatus: 200
+  };
 const timeZone = new Date().toLocaleString({timeZone: 'Asia/Jerusalem'});
 
 // Required Routers
