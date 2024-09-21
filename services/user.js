@@ -33,7 +33,7 @@ const auth = async (req) => {
         return {
             code: 200,
             user: userObject,
-            isAuthenticated: userObject.isAuth,
+            isAuth: userObject.isAuth,
         };
     } 
     catch (err) 
