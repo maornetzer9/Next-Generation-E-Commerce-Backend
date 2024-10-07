@@ -4,7 +4,6 @@ const loadUsersOrders = async (req) => {
     try
     {
         const users = await User.find({});
-        console.log();
         
         if( !users ) return { code: 404, message: 'Users not found' };
 

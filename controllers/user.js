@@ -1,21 +1,6 @@
-// const auth = require('../services/auth');
 const { auth, login, register, update, disconnect } = require('../services/user');
 
 const router = require('express').Router();
-
-router.put('/update', async (req, res) => {
-    try
-    {
-        const response = await update(req); 
-        return res.status(200).json(response);
-    }
-    catch(err)
-    {
-        console.error('Failed To Update Customer Details',err.message);
-        return res.status(500).json('Authentication failed', err.message);
-    }
-});
-
 
 router.get('/auth', async (req, res) => {
     try
@@ -56,6 +41,18 @@ router.post('/register', async (req, res) => {
     }
 });
 
+router.put('/update', async (req, res) => {
+    try
+    {
+        const response = await update(req); 
+        return res.status(200).json(response);
+    }
+    catch(err)
+    {
+        console.error('Failed To Update Customer Details',err.message);
+        return res.status(500).json('Authentication failed', err.message);
+    }
+});
 
 router.get('/disconnect', async (req, res) => {
     try

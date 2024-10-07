@@ -8,10 +8,18 @@ const auth = async (req) => {
     try 
     {
         const token = req.headers.authorization?.split(' ')[1];
-        const userVerification = jwtUtils.verifyToken(token);
-        
-        if (!userVerification) return { code: 3, message: 'Failed to verify user' };
+        if (!token) return { code: 401, message: 'No token provided.' };
 
+        const userVerification = jwtUtils.verifyToken(token);
+        if (userVerification == null) 
+        {
+            await User.findOneAndUpdate(
+                { token },
+                { $set: { isAuth: false, token: null } },
+                { new: true }
+            ); 
+            return { code: 403, message: 'Invalid or expired token please reconnect.' };
+        } 
         const { _id } = userVerification.user;
 
         const verifyUser = await User.findOneAndUpdate(
@@ -22,8 +30,6 @@ const auth = async (req) => {
 
         if (!verifyUser) return { code: 3, message: 'User not found' };
 
-        verifyUser.isAuth = true;
-        
         // Convert Mongoose document to plain JavaScript object
         const userObject = verifyUser.toObject();
 
@@ -39,7 +45,7 @@ const auth = async (req) => {
     catch (err) 
     {
         console.error('Internal Server Error.', err.message);
-        return { code: 500, message: 'Internal Server Error.' };
+        return { code: 500, message: 'Internal Server Error.'};
     }
 };
 
@@ -49,43 +55,31 @@ const login = async (req) => {
     {
         const { username, password } = req.body;
 
+        // Find user by username
         const user = await User.findOne({ username });
-        if (!user) return { code: 2, message: 'User not found.' };
+        if (!user) return { code: 404, message: 'User not found.' };
 
-        const comparePassword = compareHash(password, user.password);
+        // Asynchronously compare the password
+        const comparePassword = await compareHash(password, user.password);
+        if (!comparePassword) return { code: 401, message: 'Incorrect password' };
 
-        if (!comparePassword) return { code: 2, message: 'Incorrect password' };
+        const token = generateToken({ user });
+        user.token = token;
+        await user.save();
 
-        let token = user.token;
-        // Verify existing token
-        let isValidUserToken = token ? verifyToken(token) : false;
-
-        if (!isValidUserToken) 
-        {
-            // Generate a new token if the current token is invalid
-            token = generateToken({ user });
-            user.token = token;
-            await user.save();
-        } 
-        else 
-        {
-            // If the token is valid, extract the user from it
-            isValidUserToken = verifyToken(token);
-        }
-
-        // Clean up user data before returning it (remove password)
+        // Clean up user data before returning (remove sensitive fields like password)
         const userResponse = { ...user._doc };
         delete userResponse.password;
-
-        return { code: 200, user: userResponse };
+        
+        // Return success response
+        return { code: 200, user: userResponse, token };
     } 
-    catch (err) 
+    catch(err) 
     {
         console.error('Internal Server Error', err);
-        return { code: 500, message: 'Internal Server Error' };
-        
+        return { code: 500, message: 'Internal Server Error'};
     }
-}
+};
 
 
 const register = async (req) => {
@@ -148,7 +142,6 @@ const disconnect = async (req) => {
     try 
     {
         const token = req.headers.authorization?.split(' ')[1];
-        
         if (!token) return { code: 401, message: 'Authorization token missing' };
 
         // Verify the token
@@ -178,4 +171,4 @@ const disconnect = async (req) => {
 };
 
 
-module.exports = { auth, login, register, update, disconnect};
+module.exports = { auth, login, register, update, disconnect };

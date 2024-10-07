@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { loadUsersOrders } = require('../services/adminOrders');
+const { loadUsersOrders } = require('../services/admin');
 
 
 router.get('/customers', async (req, res) => {

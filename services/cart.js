@@ -43,7 +43,12 @@ const addToCart = async (req) => {
             user.cart.total = total.toFixed(2);
             
             await user.save();
-            return { code: 200, newProduct: user.cart.items[index], total: user.cart.total };
+            return { 
+                code: 200, 
+                newProduct: user.cart.items[index], 
+                total: user.cart.total,
+                message: 'Added Successfully'
+            };
         } 
         else 
         {
@@ -68,7 +73,13 @@ const addToCart = async (req) => {
             user.cart.items.push(newCartItem);
             
             await user.save();
-            return { code: 200, newProduct: newCartItem, total: user.cart.total};
+            return { 
+                code: 200, 
+                newProduct: 
+                newCartItem, 
+                total: user.cart.total,
+                message: 'Added Successfully'
+            };
         }
     } 
     catch(err) 
