@@ -3,14 +3,14 @@ const { compareHash } = require("../utils/bcrypt");
 const { generateToken, verifyToken } = require("../utils/jwt");
 const jwtUtils = require("../utils/jwt");
 
-
-const auth = async (req) => {
+const auth = async (req, next) => {
     try 
     {
         const token = req.headers.authorization?.split(' ')[1];
+
         if (!token) return { code: 401, message: 'No token provided.' };
 
-        const userVerification = jwtUtils.verifyToken(token);
+        const userVerification = verifyToken(token);
         if (userVerification == null) 
         {
             await User.findOneAndUpdate(
@@ -29,7 +29,8 @@ const auth = async (req) => {
         );
 
         if (!verifyUser) return { code: 3, message: 'User not found' };
-
+        console.log(verifyUser);
+        
         // Convert Mongoose document to plain JavaScript object
         const userObject = verifyUser.toObject();
 
@@ -44,13 +45,12 @@ const auth = async (req) => {
     } 
     catch (err) 
     {
-        console.error('Internal Server Error.', err.message);
-        return { code: 500, message: 'Internal Server Error.'};
+      next(err);
     }
 };
 
 
-const login = async (req) => {
+const login = async (req, next) => {
     try 
     {
         const { username, password } = req.body;
@@ -76,13 +76,12 @@ const login = async (req) => {
     } 
     catch(err) 
     {
-        console.error('Internal Server Error', err);
-        return { code: 500, message: 'Internal Server Error'};
+        next(err);
     }
 };
 
 
-const register = async (req) => {
+const register = async (req, next) => {
     try
     {
         const { firstName, lastName, username, checked, password } = req.body;
@@ -98,13 +97,12 @@ const register = async (req) => {
     }
     catch(err)
     {
-        console.error('Internal Server Error', err);
-        return { code: 500, message: 'Internal Server Error' };
+        next(err);
     }
 }
 
 
-const update = async (req) => {
+const update = async (req, next) => {
     try
     {
         const { form } = req.body;
@@ -132,13 +130,12 @@ const update = async (req) => {
     }
     catch(err)
     {
-        console.error('Internal Server Error', err.message);
-        return { code: 500, message: 'Internal Server Error' };
+        next(err);
     }
 };
 
 
-const disconnect = async (req) => {
+const disconnect = async (req, next) => {
     try 
     {
         const token = req.headers.authorization?.split(' ')[1];
@@ -165,10 +162,16 @@ const disconnect = async (req) => {
     } 
     catch(err) 
     {
-        console.error('Failed to log out user:', err.message);
-        return { code: 500, message: 'Internal Server Error' };
+        next(err);
     }
 };
 
 
-module.exports = { auth, login, register, update, disconnect };
+module.exports = { 
+    auth, 
+    login, 
+    login, 
+    register, 
+    update, 
+    disconnect 
+};

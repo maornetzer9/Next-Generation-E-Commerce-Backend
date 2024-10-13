@@ -1,70 +1,69 @@
 const { auth, login, register, update, disconnect } = require('../services/user');
 
-const router = require('express').Router();
 
-router.get('/auth', async (req, res) => {
+const authHandler = async (req, res, next) => {
     try
     {
-        const response = await auth(req); 
+        const response = await auth(req, next); 
         return res.status(200).json(response);
     }
     catch(err)
     {
-        console.error('Authentication failed',err.message);
-        return res.status(500).json('Authentication failed', err.message);
+       next(err);
     }
-});
+};
 
-
-router.post('/login', async (req, res) => {
+const loginHandler = async (req, res, next) => {
     try 
     {
-        const response = await login(req);
+        const response = await login(req, next);
         return res.status(200).json( response );
     } catch(err) 
     {
-        console.error('Failed To login User', err.message);
-        return res.status(500).json({ message: 'Login failed', error: err.message });
+       next(err);
     }
-});
+};
 
-
-router.post('/register', async (req, res) => {
+const registerHandler = async (req, res, next) => {
     try 
     {
-        const response = await register(req);
+        const response = await register(req, next);
         return res.status(200).json( response );
     } catch(err) 
     {
-        console.error('Failed To Register User', err.message);
-        return res.status(500).json({ message: 'Registration failed', error: err.message });
+        next(err);
     }
-});
+};
 
-router.put('/update', async (req, res) => {
+const updateHandler = async (req, res, next) => {
     try
     {
-        const response = await update(req); 
+        const response = await update(req, next); 
         return res.status(200).json(response);
     }
     catch(err)
     {
-        console.error('Failed To Update Customer Details',err.message);
-        return res.status(500).json('Authentication failed', err.message);
+       next(err);
     }
-});
+};
 
-router.get('/disconnect', async (req, res) => {
+const disconnectHandler = async (req, res, next) => {
     try
     {
-        const response = await disconnect(req); 
+        const response = await disconnect(req, next); 
         return res.status(200).json(response);
     }
     catch(err)
     {
-        console.error('Disconnect Failed',err.message);
-        return res.status(500).json('Internal Server Error', err.message);
+       next(err)
     }
-});
+};
 
-module.exports = { customersRouter: router };
+
+module.exports = { 
+    authHandler,
+    loginHandler,
+    registerHandler,
+    updateHandler,
+    disconnectHandler
+};

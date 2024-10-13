@@ -1,79 +1,70 @@
 const { loadProducts, modifyProduct, updateCategories, deleteCategories, createCategories } = require('../services/products');
 
-const router = require('express').Router();
 
-router.get('/', async (req, res) => {
-    try
+const loadProductsHandler = async (req, res, next) => {
+    try 
     {
         const response = await loadProducts(req);
         return res.status(200).json(response);
-    }
-    catch(err)
+    } 
+    catch(err) 
     {
-        console.error('Failed To Load Products', err.message);
-        return res.status(500).json('Failed To Load Products');
-        
+        next(err);
     }
-});
+};
 
-
-router.put('/modify', async (req, res) => {
-    try
+const modifyProductHandler = async (req, res, next) => {
+    try 
     {
         const response = await modifyProduct(req);
         return res.status(200).json(response);
-    }
-    catch(err)
+    } 
+    catch(err) 
     {
-        console.error('Failed To Edit Products', err.message);
-        return res.status(500).json('Failed To Edit Products');
-        
+        next(err);
     }
-});
+};
 
-
-router.put('/update', async (req, res) => {
-    try
+const updateCategoriesHandler = async (req, res, next) => {
+    try 
     {
         const response = await updateCategories(req);
         return res.status(200).json(response);
-    }
-    catch(err)
+    } 
+    catch(err) 
     {
-        console.error('Failed To Update Category', err.message);
-        return res.status(500).json('Failed To Update Category');
-        
+        next(err);
     }
-});
+};
 
-
-router.delete('/delete', async (req, res) => {
-    try
+const deleteCategoriesHandler = async (req, res, next) => {
+    try 
     {
         const response = await deleteCategories(req);
         return res.status(200).json(response);
-    }
-    catch(err)
+    } 
+    catch(err) 
     {
-        console.error('Failed To Delete Category', err.message);
-        return res.status(500).json('Failed To Delete Category');
-        
+        next(err);
     }
-});
+};
 
-
-router.post('/create', async (req, res) => {
-    try
+const createCategoriesHandler = async (req, res, next) => {
+    try 
     {
         const response = await createCategories(req);
         return res.status(200).json(response);
-    }
-    catch(err)
+    } 
+    catch(err) 
     {
-        console.error('Failed To Create Category', err.message);
-        return res.status(500).json('Failed To Create Category');
-        
+        next(err);
     }
-});
+};
 
-module.exports = { productsRouter: router };
+module.exports = { 
+    loadProductsHandler, 
+    modifyProductHandler, 
+    updateCategoriesHandler, 
+    deleteCategoriesHandler, 
+    createCategoriesHandler 
+};

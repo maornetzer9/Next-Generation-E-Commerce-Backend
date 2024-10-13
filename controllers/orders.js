@@ -1,35 +1,30 @@
 const { newOrder, loadOrders } = require('../services/orders');
 
-const router = require('express').Router();
-
-
-router.get('/', async (req, res) => {
-    try
+const loadOrdersHandler = async (req, res, next) => {
+    try 
     {
-        const response = await loadOrders(req); 
+        const response = await loadOrders(req);
         return res.status(200).json(response);
-    }
-    catch(err)
+    } 
+    catch(err) 
     {
-        console.error('Authentication failed',err);
-        return res.status(500).json('Authentication failed', err.message);
+        next(err);
     }
-})
+};
 
-router.post('/add', async (req, res) => {
-    try
+const newOrderHandler = async (req, res, next) => {
+    try 
     {
         const response = await newOrder(req);
         return res.status(200).json(response);
-
-    }
-    catch(error)
+    } 
+    catch(err) 
     {
-        console.error('Failed To Add New Order', error.message);
-        return res.status(500).json({ error: err.message, message: 'Internal Server Error' });
-        
+        next(err);
     }
-});
+};
 
-
-module.exports = { ordersRouter: router };
+module.exports = {
+    loadOrdersHandler,
+    newOrderHandler
+};
