@@ -29,7 +29,6 @@ const auth = async (req, next) => {
         );
 
         if (!verifyUser) return { code: 3, message: 'User not found' };
-        console.log(verifyUser);
         
         // Convert Mongoose document to plain JavaScript object
         const userObject = verifyUser.toObject();
